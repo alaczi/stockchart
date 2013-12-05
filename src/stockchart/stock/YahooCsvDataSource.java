@@ -29,7 +29,7 @@ public class YahooCsvDataSource implements DataSource{
     /**
      * Yahoo csv datasource
      */
-    private final static String url = "http://ichart.finance.yahoo.com/table.csv?s=YHOO&d=%1$d&e=%2$d&f=%3$d&g=d&a=%4$d&b=%5$d&c=%6$d&ignore=.csv";
+    private final static String URL = "http://ichart.finance.yahoo.com/table.csv?s=YHOO&d=%1$d&e=%2$d&f=%3$d&g=d&a=%4$d&b=%5$d&c=%6$d&ignore=.csv";
 
     /**
      * Gets the data from yahoo
@@ -45,14 +45,7 @@ public class YahooCsvDataSource implements DataSource{
             calFrom.setTime(from);
             Calendar calTo = new GregorianCalendar();
             calTo.setTime(to);
-            System.out.println(String.format(YahooCsvDataSource.url,
-                    calTo.get(Calendar.MONTH),
-                    calTo.get(Calendar.DAY_OF_MONTH-1),
-                    calTo.get(Calendar.YEAR),
-                    calFrom.get(Calendar.MONTH),
-                    calFrom.get(Calendar.DAY_OF_MONTH),
-                    calFrom.get(Calendar.YEAR)));
-            URL url = new URL(String.format(YahooCsvDataSource.url,
+            URL url = new URL(String.format(YahooCsvDataSource.URL,
                     calTo.get(Calendar.MONTH),
                     calTo.get(Calendar.DAY_OF_MONTH-1),
                     calTo.get(Calendar.YEAR),

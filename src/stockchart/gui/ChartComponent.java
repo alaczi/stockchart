@@ -31,8 +31,10 @@ public class ChartComponent extends Component {
     int yScaleLenghtPixel;
 
 
-    private final static int origoX = 30;
-    private final static int origoYOffset = 30;
+    private final static int ORIGO_X = 30;
+    private final static int ORIGO_Y_OFFSET = 30;
+    private final static int BORDER_RIGHT = 20;
+    private final static int BORDER_TOP = 10;
 
     /**
      * Inits a chart with the given dimensions and data
@@ -60,10 +62,11 @@ public class ChartComponent extends Component {
         if (data == null || data.isEmpty()) {
             g2d.setColor(Color.RED);
             g2d.drawString("No DATA", (width - 30) / 2, (height - 10) / 2);
+        } else {
+            this.drawYAxis(g2d);
+            this.drawXAxis(g2d);
+            this.drawChart(g2d);
         }
-        this.drawYAxis(g2d);
-        this.drawXAxis(g2d);
-        this.drawChart(g2d);
     }
 
     /**
@@ -72,8 +75,8 @@ public class ChartComponent extends Component {
      */
     private void drawYAxis(Graphics2D g) {
         g.setColor(Color.BLACK);
-        yScaleLenghtPixel = this.height - ChartComponent.origoYOffset -10;
-        g.drawLine(ChartComponent.origoX, (this.height - ChartComponent.origoYOffset), this.origoX, 10);
+        yScaleLenghtPixel = this.height - ChartComponent.ORIGO_Y_OFFSET -ChartComponent.BORDER_TOP;
+        g.drawLine(ChartComponent.ORIGO_X, (this.height - ChartComponent.ORIGO_Y_OFFSET), this.ORIGO_X, ChartComponent.BORDER_TOP);
         BigDecimal min = getMin();
         BigDecimal max = getMax();
         BigDecimal valueRange = max.subtract(min);
@@ -85,14 +88,16 @@ public class ChartComponent extends Component {
         BigDecimal stepCount = scaleRange.divide(stepValue);
         int stepPixelValue = yScaleLenghtPixel / stepCount.intValue();
         BigDecimal step = yScaleMin.add(stepValue);
-        while (step.doubleValue() < yScaleMax.doubleValue()){
-            int yposition = (this.height - ChartComponent.origoYOffset - stepPixelValue * (step.divide(stepValue).intValue()));
+        while (step.doubleValue() <= yScaleMax.doubleValue()){
+            int yposition = (this.height - ChartComponent.ORIGO_Y_OFFSET - stepPixelValue * (step.divide(stepValue).intValue()));
             g.drawString(step.toString(), 5, yposition +5);
-            g.drawLine(this.origoX -3, yposition, this.origoX +3, yposition);
+            g.drawLine(this.ORIGO_X -3 , yposition, this.ORIGO_X + 3, yposition);
+            g.setColor(Color.LIGHT_GRAY);
+            g.drawLine(this.ORIGO_X + 3 , yposition, this.width - ChartComponent.BORDER_RIGHT+3, yposition);
+            g.setColor(Color.BLACK);
             step = step.add(stepValue);
         }
-        g.drawString(yScaleMin.toString(), 5, (this.height - ChartComponent.origoYOffset + 5));
-        g.drawString(yScaleMax.toString(), 5, 15);
+        g.drawString(yScaleMin.toString(), 5, (this.height - ChartComponent.ORIGO_Y_OFFSET + 5));
     }
 
     /**
@@ -101,19 +106,24 @@ public class ChartComponent extends Component {
      */
     private void drawXAxis(Graphics2D g) {
         g.setColor(Color.BLACK);
-        g.drawLine(this.origoX, (this.height - ChartComponent.origoYOffset), this.width - 10, (this.height - ChartComponent.origoYOffset));
-        xScaleLenghtPixel = this.width - ChartComponent.origoX - 10;
+        g.drawLine(this.ORIGO_X, (this.height - ChartComponent.ORIGO_Y_OFFSET), this.width - ChartComponent.BORDER_RIGHT +3, (this.height - ChartComponent.ORIGO_Y_OFFSET));
+        xScaleLenghtPixel = this.width - ChartComponent.ORIGO_X - ChartComponent.BORDER_RIGHT;
         List sortedKeys=new ArrayList(data.keySet());
         Collections.sort(sortedKeys);
         xScaleMin = (Date)sortedKeys.toArray()[0];
         xScaleMax = (Date)sortedKeys.toArray()[sortedKeys.size() -1];
         long stepSize = (xScaleMax.getTime() - xScaleMin.getTime()) / 10;
         long step = xScaleMin.getTime();
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat format = new SimpleDateFormat("dd/MM/yy");
         for (int i = 0; i <= 10; i++){
-            int xposition = xScaleLenghtPixel*i/10 +this.origoX;
-            g.drawLine(xposition, this.height - ChartComponent.origoYOffset -3, xposition, this.height - ChartComponent.origoYOffset +3);
-            g.drawString(format.format(new Date(step)), xposition -30,  this.height - ChartComponent.origoYOffset +15 );
+            int xposition = xScaleLenghtPixel*i/10 +this.ORIGO_X;
+            g.drawLine(xposition, this.height - ChartComponent.ORIGO_Y_OFFSET -3, xposition, this.height - ChartComponent.ORIGO_Y_OFFSET +3);
+            g.drawString(format.format(new Date(step)), xposition -30,  this.height - ChartComponent.ORIGO_Y_OFFSET +15 );
+            g.setColor(Color.LIGHT_GRAY);
+            if (i != 0) {
+                g.drawLine(xposition, this.height - ChartComponent.ORIGO_Y_OFFSET -3, xposition, ChartComponent.BORDER_TOP);
+            }
+            g.setColor(Color.BLACK);
             step += stepSize;
         }
     }
@@ -136,10 +146,10 @@ public class ChartComponent extends Component {
             Date key = (Date) it.next();
             BigDecimal value = (BigDecimal) data.get(key);
             try {
-                yPositions[i]= this.height - ChartComponent.origoYOffset - (value.subtract(this.yScaleMin).multiply(new BigDecimal(this.yScaleLenghtPixel)).divide(yRange, 2, BigDecimal.ROUND_HALF_DOWN).intValue());
+                yPositions[i]= this.height - ChartComponent.ORIGO_Y_OFFSET - (value.subtract(this.yScaleMin).multiply(new BigDecimal(this.yScaleLenghtPixel)).divide(yRange, 2, BigDecimal.ROUND_HALF_DOWN).intValue());
                 BigDecimal diff = new BigDecimal(key.getTime()- this.xScaleMin.getTime());
                 BigDecimal pixelValue = diff.multiply(new BigDecimal( this.xScaleLenghtPixel)).divide(new BigDecimal(xRange), 2, BigDecimal.ROUND_HALF_DOWN);
-                xPositions[i] =  pixelValue.intValue() + ChartComponent.origoX;
+                xPositions[i] =  pixelValue.intValue() + ChartComponent.ORIGO_X;
             } catch (java.lang.ArithmeticException e) {
                 System.out.println(key.getTime()- this.xScaleMin.getTime());
                 e.printStackTrace();
