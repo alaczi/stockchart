@@ -84,7 +84,7 @@ public class ChartComponent extends Component {
         yScaleMin= new BigDecimal(Math.floor(min.doubleValue() / Math.pow(10, rangeOrderOfMagnitude.doubleValue())) *  Math.pow(10, rangeOrderOfMagnitude.doubleValue()));
         yScaleMax= new BigDecimal(Math.ceil(max.doubleValue() / Math.pow(10, rangeOrderOfMagnitude.doubleValue())) *  Math.pow(10, rangeOrderOfMagnitude.doubleValue()));
         BigDecimal scaleRange = yScaleMax.subtract(yScaleMin);
-        BigDecimal stepValue = new BigDecimal(Math.pow(10, rangeOrderOfMagnitude.doubleValue()));
+        BigDecimal stepValue = new BigDecimal(Math.pow(10, rangeOrderOfMagnitude.doubleValue())).divide(new BigDecimal(2));
         BigDecimal stepCount = scaleRange.divide(stepValue);
         int stepPixelValue = yScaleLenghtPixel / stepCount.intValue();
         BigDecimal step = yScaleMin.add(stepValue);
